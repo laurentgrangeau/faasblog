@@ -1,0 +1,30 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.6.0 (e4adfef)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: db
+  name: db
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: db
+    spec:
+      containers:
+      - env:
+        - name: ARANGO_ROOT_PASSWORD
+          value: openfaasgraphqlblog
+        image: arangodb/arangodb:3.2.3
+        name: db
+        ports:
+        - containerPort: 8529
+        resources: {}
+      restartPolicy: Always
+status: {}

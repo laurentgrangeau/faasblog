@@ -1,0 +1,37 @@
+## Grant RBAC for tiller
+kubectl -n kube-system create sa tiller
+kubectl create clusterrolebinding tiller --clusterrole cluster-admin --serviceaccount=kube-system:tiller
+
+## Install OpenFaaS on Kubernetes
+kubectl create ns openfaas
+kubectl create ns openfaas-fn
+
+helm upgrade --install --debug --namespace openfaas --reset-values --set async=false --set functionNamespace=openfaas-fn openfaas openfaas/
+
+## Access to a shell in DB
+kubectl exec -it db-7bc8ddc597-j97rk -- /bin/bash
+
+## Populate DB
+curl -X POST --data-binary @- --dump - http://root:openfaasgraphqlblog@db.default:8529/_api/database << EOF
+{
+  "name" : "faasblog"
+}
+EOF
+
+curl -X POST --data-binary @- --dump - http://root:openfaasgraphqlblog@db.default:8529/_db/faasblog/_api/collection <<EOF
+{
+  "name" : "posts"
+}
+EOF
+
+curl -X POST --data-binary @- --dump - http://root:openfaasgraphqlblog@db.default:8529/_db/faasblog/_api/collection <<EOF
+{
+  "name" : "comments"
+}
+EOF
+
+curl -X POST --data-binary @- --dump - http://root:openfaasgraphqlblog@db.default:8529/_db/faasblog/_api/collection <<EOF
+{
+  "name" : "authors"
+}
+EOF

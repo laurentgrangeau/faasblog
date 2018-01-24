@@ -1,0 +1,10 @@
+functionNamespace: openfaas-fn
+async: false
+rbac: false
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+exposeServices: true
+serviceType: LoadBalancer
+armhf: false

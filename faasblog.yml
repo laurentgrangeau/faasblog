@@ -1,0 +1,9 @@
+provider:
+  name: faas
+  gateway: http://52.178.43.55:8080/
+
+functions:
+  faasblog:
+    lang: node
+    handler: ./faasblog
+    image: laurentgrangeau/faasblog

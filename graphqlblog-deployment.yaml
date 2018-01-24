@@ -1,0 +1,37 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    function: "true"
+    kompose.cmd: kompose convert
+    kompose.version: 1.6.0 (e4adfef)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: graphqlblog
+  name: graphqlblog
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: graphqlblog
+    spec:
+      containers:
+      - env:
+        - name: ARANGODB_DB
+        - name: ARANGODB_HOST
+          value: db
+        - name: ARANGODB_PASSWORD
+        - name: ARANGODB_PORT
+          value: "8529"
+        - name: ARANGODB_USERNAME
+        - name: https_proxy
+        - name: no_proxy
+          value: gateway
+        image: laurentgrangeau/faasblog
+        name: graphqlblog
+        resources: {}
+      restartPolicy: Always
+status: {}

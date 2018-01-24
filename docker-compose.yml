@@ -1,0 +1,38 @@
+version: "3"
+services:
+    db:
+        image: arangodb/arangodb:3.2.3
+        networks:
+            - functions
+        ports:
+            - 8529:8529
+        environment:
+            no_proxy: "gateway"
+            https_proxy: $https_proxy
+            ARANGO_ROOT_PASSWORD: openfaasgraphqlblog
+        deploy:
+            placement:
+                constraints:
+                    - 'node.platform.os == linux'
+
+    # Service label of "function" allows functions to show up in UI on http://gateway:8080/
+    graphqlblog:
+        image: laurentgrangeau/faasblog
+        labels:
+            function: "true"
+        depends_on:
+            - gateway
+        networks:
+            - functions
+        environment:
+            no_proxy: "gateway"
+            https_proxy: $https_proxy
+            ARANGODB_HOST: "db"
+            ARANGODB_PORT: "8529"
+            ARANGODB_DB: "${ARANGODB_DB}"
+            ARANGODB_USERNAME: "${ARANGODB_USERNAME}"
+            ARANGODB_PASSWORD: "${ARANGODB_PASSWORD}"
+        deploy:
+            placement:
+                constraints:
+                    - 'node.platform.os == linux'
