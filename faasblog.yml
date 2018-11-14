@@ -1,9 +1,15 @@
 provider:
   name: faas
-  gateway: http://52.178.43.55:8080/
+  gateway: http://104.46.88.86:8080/
 
 functions:
   faasblog:
     lang: node
     handler: ./faasblog
     image: laurentgrangeau/faasblog
+    environment:
+      host: "db.default"
+      port: 8529
+      database: "faasblog"
+      username: "root"
+      password: "openfaasgraphqlblog"

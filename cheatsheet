@@ -9,7 +9,7 @@ kubectl create ns openfaas-fn
 helm upgrade --install --debug --namespace openfaas --reset-values --set async=false --set functionNamespace=openfaas-fn openfaas openfaas/
 
 ## Access to a shell in DB
-kubectl exec -it db-7bc8ddc597-j97rk -- /bin/bash
+kubectl exec -it db-5fcd4bbdbc-57d64 -- /bin/bash
 
 ## Populate DB
 curl -X POST --data-binary @- --dump - http://root:openfaasgraphqlblog@db.default:8529/_api/database << EOF
@@ -35,3 +35,58 @@ curl -X POST --data-binary @- --dump - http://root:openfaasgraphqlblog@db.defaul
   "name" : "authors"
 }
 EOF
+
+# Build, push, deploy
+faas-cli build -f faasblog.yml && faas-cli push -f faasblog.yml  && faas-cli deploy -f faasblog.yml
+
+# Stress test application for autoscale on Prometheus
+ab -k -c 20 -n 10000 http://gateway.laurentgrangeau.fr/function/faasblog
+
+# GraphQL commands
+mutation {
+  createAuthor(name: "Jane") {
+    id
+    name
+  }
+}
+
+mutation {
+  createPost(title: "Some Sample Post", bodyContent: "This is a sample post", author: "4350") {
+    id
+    title
+    bodyContent
+    author {
+      name
+    }
+    comments {
+      id
+    }
+  }
+}
+
+mutation {
+  createComment(content: "This is a comment", author: "4350", post: "4849") {
+    id
+    content
+    author {
+      name
+    }
+  }
+}
+
+query {
+  posts(authorId: "4350") {
+    id
+    title
+    bodyContent
+    author {
+      name
+    }
+    comments {
+      content
+      author {
+        name
+      }
+    }
+  }
+}
