@@ -6,31 +6,33 @@ kubectl create clusterrolebinding tiller --clusterrole cluster-admin --serviceac
 kubectl create ns openfaas
 kubectl create ns openfaas-fn
 
+admin : 5957536818df9ff5ba1ca7a24e4bc9648e9df9b0
+
 helm upgrade --install --debug --namespace openfaas --reset-values --set async=false --set functionNamespace=openfaas-fn openfaas openfaas/
 
 ## Access to a shell in DB
-kubectl exec -it db-5fcd4bbdbc-57d64 -- /bin/bash
+kubectl exec -it db-9dfb7b458-wk94k -- /bin/bash
 
 ## Populate DB
-curl -X POST --data-binary @- --dump - http://root:openfaasgraphqlblog@db.default:8529/_api/database << EOF
+curl -X POST --data-binary @- --dump - http://root:openfaasgraphqlblog@localhost:8529/_api/database << EOF
 {
   "name" : "faasblog"
 }
 EOF
 
-curl -X POST --data-binary @- --dump - http://root:openfaasgraphqlblog@db.default:8529/_db/faasblog/_api/collection <<EOF
+curl -X POST --data-binary @- --dump - http://root:openfaasgraphqlblog@localhost:8529/_db/faasblog/_api/collection <<EOF
 {
   "name" : "posts"
 }
 EOF
 
-curl -X POST --data-binary @- --dump - http://root:openfaasgraphqlblog@db.default:8529/_db/faasblog/_api/collection <<EOF
+curl -X POST --data-binary @- --dump - http://root:openfaasgraphqlblog@localhost:8529/_db/faasblog/_api/collection <<EOF
 {
   "name" : "comments"
 }
 EOF
 
-curl -X POST --data-binary @- --dump - http://root:openfaasgraphqlblog@db.default:8529/_db/faasblog/_api/collection <<EOF
+curl -X POST --data-binary @- --dump - http://root:openfaasgraphqlblog@localhost:8529/_db/faasblog/_api/collection <<EOF
 {
   "name" : "authors"
 }
@@ -40,7 +42,7 @@ EOF
 faas-cli build -f faasblog.yml && faas-cli push -f faasblog.yml  && faas-cli deploy -f faasblog.yml
 
 # Stress test application for autoscale on Prometheus
-ab -k -c 20 -n 10000 http://gateway.laurentgrangeau.fr/function/faasblog
+ab -k -c 20 -n 10000 http://104.46.88.86:8080/function/faasblog
 
 # GraphQL commands
 mutation {
@@ -51,7 +53,7 @@ mutation {
 }
 
 mutation {
-  createPost(title: "Some Sample Post", bodyContent: "This is a sample post", author: "4350") {
+  createPost(title: "Some Sample Post", bodyContent: "This is a sample post", author: "1252") {
     id
     title
     bodyContent
@@ -65,7 +67,7 @@ mutation {
 }
 
 mutation {
-  createComment(content: "This is a comment", author: "4350", post: "4849") {
+  createComment(content: "This is a comment", author: "1252", post: "1265") {
     id
     content
     author {
@@ -75,7 +77,7 @@ mutation {
 }
 
 query {
-  posts(authorId: "4350") {
+  posts(authorId: "1252") {
     id
     title
     bodyContent

@@ -1,6 +1,6 @@
 provider:
   name: faas
-  gateway: http://104.46.88.86:8080/
+  gateway: http://192.168.64.8:31112/
 
 functions:
   faasblog:
